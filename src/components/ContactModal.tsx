@@ -51,19 +51,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Fetch error:', error);
-      // Check if it's a CORS or network error
-      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        // This might still be successful despite CORS error
-        console.log('CORS error detected, but data may have been sent successfully');
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', feedback: '' });
-        setTimeout(() => {
-          onClose();
-          setSubmitStatus('idle');
-        }, 2000);
-      } else {
-        setSubmitStatus('error');
-      }
+      setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
