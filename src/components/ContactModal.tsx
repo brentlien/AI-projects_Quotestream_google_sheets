@@ -29,13 +29,11 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     setSubmitStatus('idle');
 
     try {
-      const response = await fetch('https://blien.app.n8n.cloud/webhook-test/122780b8-983f-4b2f-b717-1ca45a90b417', {
+      const response = await fetch('/api/webhook-test/122780b8-983f-4b2f-b717-1ca45a90b417', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
-        mode: 'cors',
         body: JSON.stringify(formData)
       });
 
