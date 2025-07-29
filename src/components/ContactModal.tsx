@@ -13,7 +13,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     feedback: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error' | 'server-unavailable'>('idle');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -52,7 +52,12 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Fetch error:', error);
-      setSubmitStatus('error');
+      if (error instanceof Error && error.message === 'Failed to fetch') {
+        // Server is not running or not accessible
+        setSubmitStatus('server-unavailable');
+      } else {
+        setSubmitStatus('error');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -134,6 +139,13 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
                 <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
                   <AlertCircle className="w-5 h-5" />
                   <span className="text-sm">Sorry, there was an error. Please try again.</span>
+                </div>
+              )}
+
+              {submitStatus === 'server-unavailable' && (
+                <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                  <AlertCircle className="w-5 h-5" />
+                  <span className="text-sm">The webhook server is not available. Please ensure the server at localhost:5678 is running.</span>
                 </div>
               )}
 
