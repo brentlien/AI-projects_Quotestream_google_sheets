@@ -29,7 +29,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     setSubmitStatus('idle');
 
     try {
-      const response = await fetch('https://680ac8f6bed1.ngrok-free.app/webhook-test/122780b8-983f-4b2f-b717-1ca45a90b417', {
+      const response = await fetch('http://localhost:5678/webhook-test/122780b8-983f-4b2f-b717-1ca45a90b417', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
