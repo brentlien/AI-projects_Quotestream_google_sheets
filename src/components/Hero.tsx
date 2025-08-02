@@ -115,7 +115,7 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
       <VideoModal 
         isOpen={isVideoModalOpen}
         onClose={closeVideoModal}
-        videoUrl="https://www.veed.io/view/36d8288f-76f8-48b8-a634-d971c9313e27?panel=share&source=ai-studio"
+        videoUrl="https://www.veed.io/embed/36d8288f-76f8-48b8-a634-d971c9313e27"
       />
     </>
   );
