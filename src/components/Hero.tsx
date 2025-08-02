@@ -7,19 +7,15 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
-  const [isVideoOpen, setIsVideoOpen] = React.useState(false);
   const videoUrl = 'https://www.veed.io/view/36d8288f-76f8-48b8-a634-d971c9313e27?panel=share&source=ai-studio';
 
   const openVideo = () => {
-    setIsVideoOpen(true);
-  };
-
-  const closeVideo = () => {
-    setIsVideoOpen(false);
+    // Open video directly in new tab
+    window.open(videoUrl, '_blank');
   };
 
   return (
-    <>
+    <div>
       <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -116,13 +112,7 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
         </div>
       </div>
       </section>
-      
-      <VideoModal 
-        isOpen={isVideoOpen} 
-        onClose={closeVideo} 
-        videoUrl={videoUrl}
-      />
-    </>
+    </div>
   );
 };
 
