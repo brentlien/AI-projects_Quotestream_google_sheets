@@ -17,12 +17,8 @@ const VideoPage = () => {
   }, []);
 
   const handleBackToLanding = () => {
-    // Try to go back to the previous page, or close tab if opened directly
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.close();
-    }
+    // Navigate back to landing page
+    window.location.href = '/';
   };
 
   const openVeedVideo = () => {

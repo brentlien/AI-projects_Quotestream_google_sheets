@@ -7,8 +7,8 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
   const openVideo = () => {
-    // Open custom video page in new tab
-    window.open('/VideoPage.html', '_blank');
+    // Open video page in new tab
+    window.open('/video', '_blank');
   };
 
   return (
