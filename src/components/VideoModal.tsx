@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Play } from 'lucide-react';
 
 interface VideoModalProps {
   isOpen: boolean;
@@ -8,22 +8,15 @@ interface VideoModalProps {
 }
 
 const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) => {
-  const [embedError, setEmbedError] = useState(false);
+  const [embedError, setEmbedError] = useState(true); // Start with error state since Veed.io blocks embeds
   const [videoEnded, setVideoEnded] = useState(false);
-
-  // Extract video ID from the Veed.io URL
-  const getVideoId = (url: string) => {
-    const match = url.match(/\/view\/([a-f0-9-]+)/);
-    return match ? match[1] : null;
-  };
-
-  const videoId = getVideoId(videoUrl);
-  const embedUrl = videoId ? `https://www.veed.io/embed/${videoId}?autoplay=1&controls=1` : null;
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      setEmbedError(false);
+      setEmbedError(true); // Veed.io blocks embeds
       setVideoEnded(false);
+      setIsLoading(false);
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -34,34 +27,30 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
     };
   }, [isOpen]);
 
-  // Auto-close when video ends (simulate with timeout for demo)
-  useEffect(() => {
-    if (isOpen && !embedError) {
-      // Simulate video duration - you can adjust this based on your actual video length
-      const timer = setTimeout(() => {
-        setVideoEnded(true);
-        setTimeout(() => {
-          onClose();
-        }, 1000); // Give a moment before closing
-      }, 60000); // Assuming 1 minute video - adjust as needed
-
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, embedError, onClose]);
-
-  const handleIframeError = () => {
-    setEmbedError(true);
-  };
-
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
 
-  const openInNewTab = () => {
-    window.open(videoUrl, '_blank');
-    onClose();
+  const openInNewTab = async () => {
+    setIsLoading(true);
+    
+    // Open the video in a new tab
+    const newTab = window.open(videoUrl, '_blank');
+    
+    if (newTab) {
+      // Simulate video watching time and auto-close modal
+      setTimeout(() => {
+        setVideoEnded(true);
+        setTimeout(() => {
+          onClose();
+          setIsLoading(false);
+        }, 2000);
+      }, 3000); // Close modal after 3 seconds to simulate "watching"
+    } else {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -81,57 +70,51 @@ const VideoModal: React.FC<VideoModalProps> = ({ isOpen, onClose, videoUrl }) =>
         </button>
 
         {/* Video container */}
-        <div className="bg-black rounded-lg overflow-hidden shadow-2xl">
-          {!embedError && embedUrl ? (
-            <div className="relative" style={{ paddingBottom: '56.25%', height: 0 }}>
-              <iframe
-                src={embedUrl}
-                className="absolute top-0 left-0 w-full h-full"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                onError={handleIframeError}
-                onLoad={(e) => {
-                  // Check if iframe loaded successfully
-                  const iframe = e.target as HTMLIFrameElement;
-                  try {
-                    // This will throw an error if the iframe is blocked
-                    iframe.contentWindow?.location.href;
-                  } catch (error) {
-                    handleIframeError();
-                  }
-                }}
-              />
-              
-              {videoEnded && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <p className="text-lg mb-2">Video completed!</p>
-                    <p className="text-sm opacity-75">Closing automatically...</p>
-                  </div>
-                </div>
-              )}
+        <div className="bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden shadow-2xl">
+          {videoEnded ? (
+            <div className="p-8 text-center text-white">
+              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Play className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Video Completed!</h3>
+              <p className="text-gray-300 mb-4">
+                Thanks for watching the QuoteStream AI demo.
+              </p>
+              <p className="text-sm text-gray-400">Closing automatically...</p>
             </div>
           ) : (
-            // Fallback when embedding fails
             <div className="p-8 text-center text-white">
               <div className="mb-6">
-                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ExternalLink className="w-8 h-8" />
+                <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Play className="w-10 h-10 text-white ml-1" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Video Embed Blocked</h3>
-                <p className="text-gray-300 mb-6">
-                  The video platform doesn't allow embedding. Click below to watch the video in a new tab.
+                <h3 className="text-2xl font-bold mb-3">Watch QuoteStream AI Demo</h3>
+                <p className="text-gray-300 mb-8 max-w-md mx-auto leading-relaxed">
+                  See how field service professionals are generating professional quotes in minutes, not hours.
                 </p>
               </div>
               
               <button
                 onClick={openInNewTab}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 mx-auto"
+                disabled={isLoading}
+                className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-400 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-3 mx-auto"
               >
-                <ExternalLink className="w-5 h-5" />
-                Watch Video
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Opening Video...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-5 h-5" />
+                    Watch Demo Now
+                  </>
+                )}
               </button>
+              
+              <p className="text-xs text-gray-400 mt-4">
+                Video opens in a new tab • Auto-closes when complete
+              </p>
             </div>
           )}
         </div>
