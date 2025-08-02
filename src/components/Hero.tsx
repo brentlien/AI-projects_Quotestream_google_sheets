@@ -1,17 +1,14 @@
 import React from 'react';
 import { ArrowRight, Star, Users, Play } from 'lucide-react';
-import VideoModal from './VideoModal';
 
 interface HeroProps {
   onOpenModal: () => void;
 }
 
 const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
-  const videoUrl = 'https://www.veed.io/view/36d8288f-76f8-48b8-a634-d971c9313e27?panel=share&source=ai-studio';
-
   const openVideo = () => {
-    // Open video directly in new tab
-    window.open(videoUrl, '_blank');
+    // Open custom video page in new tab
+    window.open('/VideoPage.html', '_blank');
   };
 
   return (
