@@ -1,17 +1,26 @@
 import React from 'react';
 import { ArrowRight, Star, Users, Play } from 'lucide-react';
+import VideoModal from './VideoModal';
 
 interface HeroProps {
   onOpenModal: () => void;
 }
 
 const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
+  const [isVideoOpen, setIsVideoOpen] = React.useState(false);
+  const videoUrl = 'https://www.veed.io/view/36d8288f-76f8-48b8-a634-d971c9313e27?panel=share&source=ai-studio';
+
   const openVideo = () => {
-    window.open('https://www.veed.io/view/36d8288f-76f8-48b8-a634-d971c9313e27?panel=share&source=ai-studio', '_blank');
+    setIsVideoOpen(true);
+  };
+
+  const closeVideo = () => {
+    setIsVideoOpen(false);
   };
 
   return (
-    <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20 px-4">
+    <>
+      <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 text-white py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
@@ -106,7 +115,14 @@ const Hero: React.FC<HeroProps> = ({ onOpenModal }) => {
           </div>
         </div>
       </div>
-    </section>
+      </section>
+      
+      <VideoModal 
+        isOpen={isVideoOpen} 
+        onClose={closeVideo} 
+        videoUrl={videoUrl}
+      />
+    </>
   );
 };
 
