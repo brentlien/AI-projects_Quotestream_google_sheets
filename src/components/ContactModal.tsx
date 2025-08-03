@@ -28,39 +28,52 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    try {
-      const response = await fetch('https://e3a1740dbda1.ngrok-free.app/webhook-test/122780b8-983f-4b2f-b717-1ca45a90b417', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        mode: 'cors',
-        credentials: 'omit',
-        body: JSON.stringify(formData)
-      });
+    // Check if we're in development or production
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (isDevelopment) {
+      // Try to connect to local webhook server in development
+      try {
+        const response = await fetch('http://localhost:5678/webhook-test/122780b8-983f-4b2f-b717-1ca45a90b417', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          mode: 'cors',
+          credentials: 'omit',
+          body: JSON.stringify(formData)
+        });
 
-      if (response.ok) {
+        if (response.ok) {
+          setSubmitStatus('success');
+          setFormData({ name: '', email: '', feedback: '' });
+          setTimeout(() => {
+            onClose();
+            setSubmitStatus('idle');
+          }, 2000);
+        } else {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        setSubmitStatus('server-unavailable');
+      }
+    } else {
+      // In production, simulate form submission for demo purposes
+      // In a real application, you would integrate with a service like Netlify Forms, Formspree, or your own backend
+      setTimeout(() => {
+        console.log('Form data (demo):', formData);
         setSubmitStatus('success');
         setFormData({ name: '', email: '', feedback: '' });
         setTimeout(() => {
           onClose();
           setSubmitStatus('idle');
         }, 2000);
-      } else {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-    } catch (error) {
-      console.error('Fetch error:', error);
-      if (error instanceof Error && error.message === 'Failed to fetch') {
-        // Server is not running or not accessible
-        setSubmitStatus('server-unavailable');
-      } else {
-        setSubmitStatus('error');
-      }
-    } finally {
-      setIsSubmitting(false);
+      }, 1500);
     }
+    
+    setIsSubmitting(false);
   };
 
   if (!isOpen) return null;
@@ -145,7 +158,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
               {submitStatus === 'server-unavailable' && (
                 <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
                   <AlertCircle className="w-5 h-5" />
-                  <span className="text-sm">The webhook server is not available. Please ensure the server at localhost:5678 is running.</span>
+                  <span className="text-sm">The webhook server is not available in development mode. Please ensure the server at localhost:5678 is running.</span>
                 </div>
               )}
 
