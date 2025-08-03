@@ -49,6 +49,14 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       img.onerror = () => console.log('⚠️ GET request completed (expected for Apps Script)');
       img.src = submitUrl;
       
+      
+      // Reset form and close modal after showing success briefly
+      setTimeout(() => {
+        setFormData({ name: '', email: '', feedback: '' });
+        setSubmitStatus('idle');
+        onClose();
+      }, 2000);
+      
     } catch (error) {
       console.error('❌ Error submitting form:', error);
       setSubmitStatus('error');
