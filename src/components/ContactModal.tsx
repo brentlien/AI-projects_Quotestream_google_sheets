@@ -50,7 +50,6 @@ const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
       img.src = submitUrl;
       
       console.log('✅ GET request sent via image');
-      setSubmitStatus('success');
     } catch (error) {
       console.error('❌ Error submitting form:', error);
       setSubmitStatus('error');
